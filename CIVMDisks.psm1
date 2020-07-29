@@ -2,8 +2,9 @@
 # PowerShell Module to aid VM internal disk manipulation in VMware
 # Cloud Director (VCD)
 #   Author: Jon Waite, (c)2020 All Rights Reserved
-#  License: MIT - See LICENSE.md
-#  Version: 0.1 (alpha)
+#  License: MIT - See LICENSE file
+#  Version: 1.0 (initial release)
+#     Date: July 30th 2020
 # Homepage: https://github.com/jondwaite/CIVMDisks
 
 # Controller types available in VCD
