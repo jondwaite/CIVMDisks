@@ -22,10 +22,15 @@ Function Get-APIVersion {
         [Switch]$SkipCertificateCheck
     )
 
+    $APICheckParams = @{
+        Uri = "https://$($Uri.Host)/api/versions"
+        Headers = @{'Accept'='application/*+xml'}
+        Method = 'Get'
+    }
+    If ($SkipCertificateCheck) {$APICheckParams += @{'SkipCertificateCheck'=$true}}
+
     Try {
-        [xml]$Versions = Invoke-RestMethod -Uri "https://$($Uri.Host)/api/versions" `
-            -Headers @{'Accept'='application/*+xml'} `
-            -Method 'Get'
+        [xml]$Versions = Invoke-RestMethod @APICheckParams
         $APIVersion = (($Versions.SupportedVersions.VersionInfo | `
             Where-Object { $_.deprecated -eq $false }) | `
             Measure-Object -Property Version -Maximum).Maximum.ToString() + ".0"
