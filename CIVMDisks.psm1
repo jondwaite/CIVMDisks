@@ -51,8 +51,7 @@ Function Get-SessionId {
     $SessionId = ($global:DefaultCIServers | Where-Object { $_.ServiceUri.Host -eq ([Uri]$VM.Href).Host }).SessionId
 
     If (!$SessionId) {
-        Write-Error ("Could not match supplied VM to a connected VCD instance, exiting.")
-        Exit
+        Write-Error ("Could not match supplied VM to a connected VCD instance, exiting.");Break
     }
     return $SessionId
 }
@@ -82,8 +81,7 @@ Function Get-VMDiskXML {
     Try {
         [xml]$xmlvm = Invoke-RestMethod @VMDetailsParams
     } Catch {
-        Write-Error "Error retrieving VM properties from VCD API, exiting."
-        Exit
+        Write-Error "Error retrieving VM properties from VCD API, exiting.";Break
     }
 
     # Remove all Child nodes in XML EXCEPT VmSpecSection:
@@ -126,8 +124,7 @@ Function Set-VMDiskXML {
     try {
         $VCDTask = Invoke-RestMethod @UpdateVmParams
     } catch {
-        Write-Error ("Exception occurred attempting to add disk to VM, exiting.")
-        Exit
+        Write-Error ("Exception occurred attempting to add disk to VM, exiting."); Break
     }
 
     if ($VCDtask.Task.href) {           # Task submitted ok and we've asked to wait for it to complete
@@ -165,14 +162,14 @@ Function WaitForTask {
 
     :taskcheck While ($TaskTimeout -gt 0) { # Check task status until timeout is exceeeded
         Try { $taskStatus = Invoke-RestMethod @TaskParams }
-        Catch { Write-Error ("Error getting task status from VCD API: $($_.Exception.Message), exiting."); Exit }
+        Catch { Write-Error ("Error getting task status from VCD API: $($_.Exception.Message), exiting."); Break }
 
         switch ($taskStatus.Task.Status) {
             "success" { break taskcheck }
             "running" { Write-Host -ForegroundColor Green "Task Status: Running" }
-            "error"   { Write-Error ("Task ended with error, exiting."); Exit }
-            "canceled" { Write-Error ("Task was cancelled, exiting."); Exit }
-            "aborted" { Write-Error ("Task was aborted, exiting."); Exit }
+            "error"   { Write-Error ("Task ended with error, exiting."); Break }
+            "canceled" { Write-Error ("Task was cancelled, exiting."); Break }
+            "aborted" { Write-Error ("Task was aborted, exiting."); Break }
             "queued"  { Write-Host -ForegroundColor Yellow "Task is queued." }
             "preRunning" { Write-Host -ForegroundColor Yellow "Task is pre-running." }
         }
@@ -284,7 +281,7 @@ Function Add-CIVMDisk {
                 $VDCSPs | ForEach-Object {
                     Write-Host -ForegroundColor Cyan ($_.Name)
                 }
-                Exit
+                Break
             }
         } else { $DiskSP = $VMSP }
     }
@@ -308,7 +305,7 @@ Function Add-CIVMDisk {
         $DiskSlots | ForEach-Object { 
             Write-Host -ForegroundColor Cyan ($_)
         }
-        Exit
+        Break
     }
 
     # If we haven't specified a UnitId, find the first free/empty slot for the new disk:
@@ -324,14 +321,14 @@ Function Add-CIVMDisk {
         }
         if (!$SlotFound) {
             Write-Error ("Could not find an available slot to add a disk to bus of type $($BusType) and controller number $($BusId), exiting.")
-            Exit
+            Break
         }
     }
     
     # Check if a disk already exists at the location we're attempting to use for the new disk:
     if ($VmDisks | Where-Object { $_.UnitNumber -eq $UnitId}) {
         Write-Error ("A disk already exists on VM '$($VM.Name)' at UnitId:$($UnitId) on bus:$($BusId) of type '$($BusType)', cannot add a new one, exiting.")
-        Exit
+        Break
     }
 
     Write-Host ("Adding new disk to VM '$($VM.Name)', size:$($SizeMB)MB type '$($BusType)' on bus:$($BusId) at UnitId:$($UnitId).")
@@ -409,7 +406,7 @@ Function Remove-CIVMDisk {
 
     if (!$Confirm) {
         Write-Host -ForegroundColor Green ("Disk will not be removed, re-run this command with the -Confirm switch to actually remove/delete this disk.")
-        Exit
+        Break
     } else {
         Write-Host -ForegroundColor Red ("-Confirm switch was specified, this disk will now be permenantly deleted.")
     }
