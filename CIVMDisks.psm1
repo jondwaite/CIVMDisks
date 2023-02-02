@@ -34,7 +34,11 @@ Function Get-APIVersion {
         [xml]$Versions = Invoke-RestMethod @APICheckParams
         $APIVersion = (($Versions.SupportedVersions.VersionInfo | `
             Where-Object { $_.deprecated -eq $false }) | `
-            Measure-Object -Property Version -Maximum).Maximum.ToString() + ".0"
+            Measure-Object -Property Version -Maximum).Maximum.ToString()
+        
+        # Detect and deal with the differing returns for integer API versions vs. versions ending in a decimal (e.g. 36 vs 36.1):
+        If ($APIVersion.Substring($APIVersion.Length-2,1) -ne ".") { $APIVersion += ".0" }
+
         return $APIVersion
     } Catch {
         Write-Error ("Error occurred determining maximum supported API version.")
