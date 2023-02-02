@@ -1,10 +1,10 @@
 # CIVMDisks.psm1
 # PowerShell Module to aid VM internal disk manipulation in VMware
 # Cloud Director (VCD)
-#   Author: Jon Waite, (c)2020 All Rights Reserved
+#   Author: Jon Waite, (c)2020-2023 All Rights Reserved
 #  License: MIT - See LICENSE file
 #  Version: 1.0 (initial release)
-#     Date: July 30th 2020
+#     Date: February 2nd 2023
 # Homepage: https://github.com/jondwaite/CIVMDisks
 
 # Controller types available in VCD
